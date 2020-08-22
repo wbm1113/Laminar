@@ -4,14 +4,16 @@ class desktop
     static uselessWinTitles := ["Default IME"]
     
     get() {
+        sysGet, topLeftX, 76
+        sysGet, topLeftY, 77
         sysGet, screenW, 78
         sysGet, screenH, 79
         this.w := screenW
         this.h := screenH
         SysGet, primaryMonitor, MonitorPrimary
         SysGet, coords, Monitor, % primaryMonitor
-        this.topLeftX := coordsLeft
-        this.topLeftY := coordsTop
+        this.topLeftX := topLeftX
+        this.topLeftY := topLeftY
         this.centerX := (coordsLeft + coordsRight) / 2
         this.centerY := (coordsTop + coordsBottom) / 2
     }
