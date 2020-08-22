@@ -54,4 +54,16 @@ class mouse extends protoClass
         MouseMove, % this.savedPos.x, % this.savedPos.y, 0
         return this
     }
+    
+    setCoordsToZeroBase(x, y) {
+        dx := desktop.topLeftX
+        dy := desktop.topLeftY
+        if (desktop.topLeftX < 0) {
+            x = abs(dx)
+        }
+        if (desktop.topLeftY < 0) {
+            y = abs(dy)
+        }
+        return [x, y]
+    }
 }
