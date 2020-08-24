@@ -1,7 +1,6 @@
 class gridState_default
 {
     eventShift() {
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
         eventMgr.enabled := 1
     }
@@ -39,14 +38,15 @@ class gridState_default
 
     activate() {
         critical, on
-        grid.lastActiveState := grid.activeState
+        eventMgr.enabled := 0
+        , grid.lastActiveState := grid.activeState
         , grid.activeState := "default"
-        , this.eventShift()
         , this.menuShift()
         , this.resetProperties()
-        , this.track()
         , this.moveSelector()
         , gui.ctrls["focusDumpster"].focus()
+        , this.eventShift()
+        this.track()
         critical, off    
     }
 

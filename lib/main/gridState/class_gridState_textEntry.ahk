@@ -25,20 +25,40 @@ class gridState_textEntry
     }
 
     activate() {
+        critical, on
+        eventMgr.enabled := 0
+
         actionStack.acceptingNewActions := 0
+
+        this.shape := gridState_selecting.selectedShape
+
+        if (this.shape.bitmap) {
+            gridState_default.activate()
+            sleep 300
+            return
+        }
+
+        cc := coordComm.snapToGridCoords
+        shapeUnderneathMouse := grid.detectProximity_shapes(cc.x, cc.y, grid.padding)
+        if (shapeUnderneathMouse.alias != this.shape.alias) {
+            gridState_default.activate()
+            sleep 300
+            return
+        }
 
         grid.lastActiveState := grid.activeState
         grid.activeState := "textEntry"
 
-        this.shape := gridState_selecting.selectedShape
-
-        this.eventShift()
         this.menuShift()
         this.resetProperties()
 
         this.shape.attachText()
         this.initialShapeText := this.shape.text
         this.shape.startEditingText()
+
+        this.eventShift()
+        sleep 150
+        critical, off
     }
 
     confirm() {

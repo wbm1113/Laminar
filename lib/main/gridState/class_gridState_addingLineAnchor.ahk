@@ -4,7 +4,6 @@ class gridState_addingLineAnchor
     static dummyHeight := 20
 
     eventShift() {
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -34,17 +33,19 @@ class gridState_addingLineAnchor
     }
 
     activate() {
+        critical, on
+        eventMgr.enabled := 0
+
         if this.detectInvalidConditions()
             return
-
-
 
         grid.lastActiveState := grid.activeState
         grid.activeState := "addingLineAnchor"
         
-        this.eventShift()
         this.menuShift()
         this.resetProperties()
+        this.eventShift()
+        critical, on
     }
 
     track() {

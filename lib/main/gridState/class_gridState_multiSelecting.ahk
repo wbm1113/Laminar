@@ -1,8 +1,6 @@
 class gridState_multiSelecting
 {
     eventShift() {
-        eventMgr.enabled := 0
-
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -51,11 +49,19 @@ class gridState_multiSelecting
     }
 
     activate() {
+        critical, on
+        eventMgr.enabled := 0
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "multiSelecting"
+
         this.resetProperties()
-        this.eventShift()
+        
         this.menuShift()
+
+        this.eventShift()
+        sleep 150
+        critical, off
     }
 
     enableTracking() {

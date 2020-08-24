@@ -1,9 +1,6 @@
 class gridState_moving
 {
     eventShift() {
-        critical, on
-
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -15,8 +12,6 @@ class gridState_moving
 
         eventMgr.events["leftClickRelease"].swap(2, "gridState_moving_move")
         eventMgr.events["leftClickRelease"].enabled := 1
-
-        critical, off
     }
 
     menuShift() {
@@ -38,12 +33,20 @@ class gridState_moving
     }
 
     activate() {
+        critical, on
+        eventMgr.enabled := 0
+
         this.resetProperties()
-        this.eventShift()
+        
         this.menuShift()
+
         cursor.set("pan")
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "moving"
+
+        this.eventShift()
+        critical, off
     }
 
     liveUpdate(valid) {
@@ -99,15 +102,8 @@ class gridState_moving
     move() {
         eventMgr.enabled := 0
         alignMgr.clear()
-
-        if abs(this.x - this.initial_x) < 3 or abs(this.y - this.initial_y) < 3 {
-            gridState_textEntry.activate()
-            return
-        }        
-
         this.selectedShape.repos(this.x, this.y)
         gridState_selecting.activate()
-        
     }
 
     abort() {

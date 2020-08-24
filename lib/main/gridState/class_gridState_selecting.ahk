@@ -1,9 +1,6 @@
 class gridState_selecting
 {
     eventShift() {
-        critical, on
-
-        eventManager.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -14,10 +11,6 @@ class gridState_selecting
 
         eventMgr.events["rightClick"].enabled := 1
 
-        critical, off
-    }
-
-    eventShift2() { ;// eventShift() has to happen in order for selectShape() to work; this function depends on selectShape()
         if this.selectedShape.bitmap or this.shapeType = "lineAnchor" {
             eventManager.events["doubleLeftClick"].enabled := 0
         } else {
@@ -64,6 +57,7 @@ class gridState_selecting
                 m.menus["crop"].enable()
                 m.menus["color"].disable()
                 m.menus["add/edit shape text"].disable()
+                m.menus["text properties"].disable()
             } else {
                 m.menus["text properties"].disable()
                 m.menus["add/edit shape text"].enable()
@@ -103,10 +97,11 @@ class gridState_selecting
 
     activate(forceSelection = 0) {
         critical, on
+        eventManager.enabled := 0
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "selecting"
         this.resetProperties()
-        this.eventShift()
 
         if (forceSelection) {
             gridState_default.collisionTarget := forceSelection
@@ -114,8 +109,20 @@ class gridState_selecting
 
         this.selectShape(gridState_default.collisionTarget)
         this.menuShift()
-        this.eventShift2()
+
+        this.eventShift()
         critical, off
+    }
+
+    selectShape(shape) {
+        this.selectedShape := shape
+        this.shapeType := grid.isLineAnchor(shape) ? "lineAnchor" : grid.extractType(this.selectedShape)
+        scratchPad.clear()
+        if (this.shapeType = "line" or this.shapeType = "lineAnchor")
+            this.selectedShape.outline("black", 2)
+        else if (this.shapeType = "shape")
+            this.selectedShape.handleOutline()
+        scratchPad.update()
     }
 
     detectAsynchronousCall() {
@@ -155,17 +162,6 @@ class gridState_selecting
     swapSelection() {
         eventManager.enabled := 0
         this.activate(this.collisionTarget)
-    }
-
-    selectShape(shape) {
-        this.selectedShape := shape
-        this.shapeType := grid.isLineAnchor(shape) ? "lineAnchor" : grid.extractType(this.selectedShape)
-        scratchPad.clear()
-        if (this.shapeType = "line" or this.shapeType = "lineAnchor")
-            this.selectedShape.outline("black", 2)
-        else if (this.shapeType = "shape")
-            this.selectedShape.handleOutline()
-        scratchPad.update()
     }
 
     hoverEdge(shape) {

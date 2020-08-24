@@ -1,9 +1,6 @@
 class gridState_copying
 {
     eventShift() {
-        critical, on
-
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -16,8 +13,6 @@ class gridState_copying
 
         eventMgr.events["rightClick"].swap(2, "gridState_copying_abort")
         eventMgr.events["rightClick"].enabled := 1
-
-        critical, off
     }
 
     menuShift() {
@@ -33,20 +28,28 @@ class gridState_copying
     }
 
     activate() {
-        if grid.activeState != "selecting" or ! isObject(gridState_selecting.selectedShape)
+        critical, on
+        eventMgr.enabled := 0
+        
+        if grid.activeState != "selecting" or ! isObject(gridState_selecting.selectedShape) {
+            gridState_default.activate()
             return
+        }
 
         grid.lastActiveState := grid.activeState
         grid.activeState := "copying" 
 
         this.resetProperties()
-        if this.selectedShape.isLineAnchor
+        if this.selectedShape.isLineAnchor {
+            gridState_default.activate()
             return
+        }
 
-        this.eventShift()
         this.menuShift()
-        
         this.drawDashedOutline()
+        this.eventShift()
+        sleep 150
+        critical, off
     }
 
     drawDashedOutline() {
@@ -102,12 +105,18 @@ class gridState_copying
     }
 
     paste() {
-        actionStack.acceptingNewActions := 0
         eventMgr.enabled := 0
+        actionStack.acceptingNewActions := 0
+        
         shape := this.selectedShape
         newShape := grid.addShape(shape.form, this.x, this.y, shape.w, shape.h)
         newShape.render()
-        newShape.text := shape.text
+        if (shape.text) {
+            newShape.text := shape.text
+            newShape.textSize := shape.textSize
+            newShape.sizeAlias := shape.sizeAlias
+            newShape.textBold := shape.textBold
+        }
         (newShape.bitmap) ? newShape.bitmap := shape.bitmap
         newShape.repos(this.x, this.y, shape.w, shape.h)
         newShape.vCenterText()

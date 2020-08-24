@@ -3,7 +3,6 @@ class gridState_drawing
     x := 0, y := 0 ;// updates from gridState_default
 
     eventShift() {
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -33,11 +32,20 @@ class gridState_drawing
 
     activate() {
         critical, on
-        this.eventShift()
+        eventMgr.enabled := 0
+
+        if (grid.activeState != "default") {
+            gridState_default.activate()
+            return
+        }
+
         this.menuShift()
         this.resetProperties()
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "drawing"
+        
+        this.eventShift()
         critical, off
     }
 

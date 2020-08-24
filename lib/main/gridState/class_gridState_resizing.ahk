@@ -1,7 +1,6 @@
 class gridState_resizing
 {
     eventShift() {
-        eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
         eventMgr.events["mouseMove"].swap(1, "init")
@@ -35,11 +34,18 @@ class gridState_resizing
     }
 
     activate() {
+        critical, on
+        eventMgr.enabled := 0
+
         this.resetProperties()
-        this.eventShift()
+
         this.menuShift()
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "resizing"
+
+        this.eventShift()
+        critical, off
     }
 
     track() {

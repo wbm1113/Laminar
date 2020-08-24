@@ -12,38 +12,33 @@ class gridState_connecting
     }
 
     getOrigShape() {
-        if grid.activeState != "selecting"
-            return
-
+        critical, on
         eventMgr.enabled := 0
         eventMgr.resetToDefault()
 
+        if grid.activeState != "selecting" {
+            gridState_default.activate()
+            return
+        }
+
         this.resetProperties()
-
         scratchPad.clear().update()
-
         grid.lastActiveState := grid.activeState
         grid.activeState := "connecting"
 
-        eventMgr.events["mouseMove"].swap(2, "gridState_connecting_targetCollision")
-        eventMgr.events["mouseMove"].enabled := 1
 
-        eventMgr.events["leftClick"].swap(2, 0)
-        eventMgr.events["leftClick"].enabled := 1
-
-        eventMgr.events["rightClick"].enabled := 1
-    
         this.origShape := gridState_selecting.selectedShape
         for i, s in grid.shapes
             s.render(scratchPad2,, s.alias = this.origShape.alias ? "black" : "solidGreen")
-
-        critical, on
-        eventMgr.suspended := 1
         loop 10
             scratchPad2.update(a_index), sleep.call(1)
-        eventMgr.suspended := 0
-        critical, off
-
+        
+        eventMgr.events["mouseMove"].swap(2, "gridState_connecting_targetCollision")
+        eventMgr.events["mouseMove"].enabled := 1
+        eventMgr.events["leftClick"].swap(2, 0)
+        eventMgr.events["leftClick"].enabled := 1
+        eventMgr.events["rightClick"].enabled := 1
+        
         this.targetCollision()
     }
 

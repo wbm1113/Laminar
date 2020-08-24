@@ -39,13 +39,27 @@ class gridState_cropping
     }
 
     activate() {
-        this.eventShift()
-        this.menuShift()
+        critical, on
+        eventMgr.enabled := 0
+
         this.resetProperties()
+
+        if (! this.selectedShape.bitmap) {
+            gridState_default.activate()
+            return
+        }
+
         this.renderBackerBitmap()
         this.drawOutline()
+
         grid.lastActiveState := grid.activeState
         grid.activeState := "cropping"
+
+        this.menuShift()
+        this.eventShift()
+
+        sleep 150
+        critical, off
     }
 
     renderBackerBitmap() {
